@@ -435,6 +435,202 @@ files:
           };
       }
     learner_created: false
-feedback_link: https://hyperskill.org/projects/189/stages/947/implement#comment
+  - name: src/cinema/models/MovieTheatre.java
+    visible: true
+    text: |
+      package cinema.models;
+      
+      import java.util.ArrayList;
+      import java.util.List;
+      import org.springframework.stereotype.Component;
+      
+      public class MovieTheatre {
+          private int rows;
+          private int columns;
+          List<Seat> seats;
+      
+      
+          public MovieTheatre() {
+      
+          }
+      
+          public MovieTheatre(int rows, int columns) {
+              this.rows = rows;
+              this.columns = columns;
+              seats = new ArrayList();
+              for (int i = 0; i < rows; i++) {
+                  for (int j = 0; j < columns; j++) {
+                      seats.add(new Seat(i + 1, j + 1, i <= 4 ? 10 : 8));
+                  }
+              }
+          }
+      
+          public int getRows() {
+              return rows;
+          }
+      
+          public void setRows(int rows) {
+              this.rows = rows;
+          }
+      
+          public int getColumns() {
+              return columns;
+          }
+      
+          public void setColumns(int columns) {
+              this.columns = columns;
+          }
+      
+          public List<Seat> getSeats() {
+              return seats;
+          }
+      
+          public void setSeats(List<Seat> seats) {
+              this.seats = seats;
+          }
+      }
+    learner_created: true
+  - name: src/cinema/api/PurchaseService.java
+    visible: true
+    text: |
+      package cinema.api;
+      
+      import cinema.errors.ErrorMessage;
+      import cinema.models.MovieTheatre;
+      import cinema.models.Seat;
+      import java.util.List;
+      import org.springframework.http.ResponseEntity;
+      import org.springframework.web.bind.annotation.PostMapping;
+      import org.springframework.web.bind.annotation.RequestBody;
+      import org.springframework.web.bind.annotation.RestController;
+      
+      @RestController
+      public class PurchaseService {
+      
+          private final MovieTheatre movieTheatre;
+      
+          public PurchaseService(MovieTheatre movieTheatre) {
+              this.movieTheatre = movieTheatre;
+          }
+      
+          @PostMapping("/purchase")
+          public ResponseEntity purchase(@RequestBody Seat seat) {
+              List<Seat> seats = movieTheatre.getSeats();
+              int row = seat.getRow();
+              int column = seat.getColumn();
+              if (row < 1 || row > 9 || column < 1 || column > 9) {
+                  return ResponseEntity.badRequest()
+                          .body(new ErrorMessage("The number of a row or a column is out of bounds!"));
+              }
+      
+              Seat seatToBook = seats.get(((row-1) * 9) + column-1);
+              if (!seatToBook.isBooked()) {
+                  seatToBook.setBooked(true);
+                  return ResponseEntity.ok(seatToBook);
+              } else {
+                  return ResponseEntity.badRequest().body(new ErrorMessage("The ticket has been already purchased!"));
+              }
+          }
+      }
+    learner_created: true
+  - name: src/cinema/errors/ErrorMessage.java
+    visible: true
+    text: |
+      package cinema.errors;
+      
+      public class ErrorMessage {
+          private String error;
+      
+          public ErrorMessage(String error) {
+              this.error = error;
+          }
+      
+          public String getError() {
+              return error;
+          }
+      
+          public void setError(String error) {
+              this.error = error;
+          }
+      }
+    learner_created: true
+  - name: src/cinema/models/Seat.java
+    visible: true
+    text: |
+      package cinema.models;
+      
+      import com.fasterxml.jackson.annotation.JsonIgnore;
+      import org.springframework.stereotype.Component;
+      
+      public class Seat {
+          private int row;
+          private int column;
+      
+          private int price;
+      
+          @JsonIgnore
+          private boolean booked;
+      
+      
+          public Seat(){
+      
+          }
+          public Seat(int row, int column, int price) {
+              this.row = row;
+              this.column = column;
+              this.price = price;
+          }
+      
+          public int getRow() {
+              return row;
+          }
+      
+          public void setRow(int row) {
+              this.row = row;
+          }
+      
+          public int getColumn() {
+              return column;
+          }
+      
+          public void setColumn(int column) {
+              this.column = column;
+          }
+      
+          public int getPrice() {
+              return price;
+          }
+      
+          public void setPrice(int price) {
+              this.price = price;
+          }
+      
+          public boolean isBooked() {
+              return booked;
+          }
+      
+          public void setBooked(boolean booked) {
+              this.booked = booked;
+          }
+      }
+    learner_created: true
+  - name: src/cinema/api/SeatService.java
+    visible: true
+    text: |
+      package cinema.api;
+      
+      import cinema.models.MovieTheatre;
+      import org.springframework.web.bind.annotation.GetMapping;
+      import org.springframework.web.bind.annotation.RestController;
+      
+      @RestController
+      public class SeatService {
+          @GetMapping("/seats")
+          public MovieTheatre getMovieTheatre(){
+              return new MovieTheatre(9,9);
+          }
+      }
+    learner_created: true
+feedback_link: https://hyperskill.org/learn/step/13377#comment
 status: Unchecked
-record: -1
+record: 3

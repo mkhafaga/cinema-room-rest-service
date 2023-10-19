@@ -120,9 +120,9 @@ files:
   - name: src/cinema/models/MovieTheatre.java
     visible: true
     learner_created: true
-feedback_link: https://hyperskill.org/projects/189/stages/945/implement#comment
+feedback_link: https://hyperskill.org/learn/step/13375#comment
 status: Solved
 feedback:
   message: Congratulations!
   time: "Tue, 17 Oct 2023 04:19:21 UTC"
-record: -1
+record: 1

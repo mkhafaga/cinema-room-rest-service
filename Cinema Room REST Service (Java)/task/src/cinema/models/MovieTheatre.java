@@ -9,13 +9,18 @@ public class MovieTheatre {
     private int columns;
     List<Seat> seats;
 
+
+    public MovieTheatre() {
+
+    }
+
     public MovieTheatre(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        seats = new ArrayList<>();
-        for (int i = 1; i <= rows; i++) {
-            for (int j = 1; j <= columns; j++) {
-                seats.add(new Seat(i, j));
+        seats = new ArrayList();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                seats.add(new Seat(i + 1, j + 1, i <= 4 ? 10 : 8));
             }
         }
     }
