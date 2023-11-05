@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://cogniterra.org/media/attachments/lesson/25574/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Thu, 19 Oct 2023 02:38:00 UTC"
+update_date: "Sat, 04 Nov 2023 21:30:52 UTC"
 stages:
   - id: 945
     step: 13375
@@ -13,7 +13,7 @@ stages:
     is_completed: true
   - id: 947
     step: 13377
-    is_completed: false
+    is_completed: true
   - id: 948
     step: 13378
     is_completed: false
@@ -151,7 +151,7 @@ topics:
       theory_id: 5077
     - title: Building apps using Gradle
       theory_id: 7917
-    - title: Dependency management
+    - title: "Dependency management: repositories"
       theory_id: 5076
     - title: External resources
       theory_id: 6216
@@ -167,10 +167,10 @@ topics:
       theory_id: 7545
     - title: Dependency injection
       theory_id: 20580
-    - title: Multidimensional array
-      theory_id: 1933
     - title: Introduction to software architecture
       theory_id: 15368
+    - title: Multidimensional array
+      theory_id: 1933
     - title: HTML basics
       theory_id: 6434
     - title: Tags and Attributes

@@ -490,49 +490,6 @@ files:
           }
       }
     learner_created: true
-  - name: src/cinema/api/PurchaseService.java
-    visible: true
-    text: |
-      package cinema.api;
-      
-      import cinema.errors.ErrorMessage;
-      import cinema.models.MovieTheatre;
-      import cinema.models.Seat;
-      import java.util.List;
-      import org.springframework.http.ResponseEntity;
-      import org.springframework.web.bind.annotation.PostMapping;
-      import org.springframework.web.bind.annotation.RequestBody;
-      import org.springframework.web.bind.annotation.RestController;
-      
-      @RestController
-      public class PurchaseService {
-      
-          private final MovieTheatre movieTheatre;
-      
-          public PurchaseService(MovieTheatre movieTheatre) {
-              this.movieTheatre = movieTheatre;
-          }
-      
-          @PostMapping("/purchase")
-          public ResponseEntity purchase(@RequestBody Seat seat) {
-              List<Seat> seats = movieTheatre.getSeats();
-              int row = seat.getRow();
-              int column = seat.getColumn();
-              if (row < 1 || row > 9 || column < 1 || column > 9) {
-                  return ResponseEntity.badRequest()
-                          .body(new ErrorMessage("The number of a row or a column is out of bounds!"));
-              }
-      
-              Seat seatToBook = seats.get(((row-1) * 9) + column-1);
-              if (!seatToBook.isBooked()) {
-                  seatToBook.setBooked(true);
-                  return ResponseEntity.ok(seatToBook);
-              } else {
-                  return ResponseEntity.badRequest().body(new ErrorMessage("The ticket has been already purchased!"));
-              }
-          }
-      }
-    learner_created: true
   - name: src/cinema/errors/ErrorMessage.java
     visible: true
     text: |
@@ -614,23 +571,27 @@ files:
           }
       }
     learner_created: true
+  - name: src/cinema/api/CinemaController.java
+    visible: true
+    learner_created: true
+  - name: src/cinema/models/TokenParam.java
+    visible: true
+    learner_created: true
+  - name: src/cinema/errors/TicketNotFoundException.java
+    visible: true
+    learner_created: true
+  - name: src/cinema/api/PurchaseService.java
+    visible: true
+    learner_created: true
   - name: src/cinema/api/SeatService.java
     visible: true
-    text: |
-      package cinema.api;
-      
-      import cinema.models.MovieTheatre;
-      import org.springframework.web.bind.annotation.GetMapping;
-      import org.springframework.web.bind.annotation.RestController;
-      
-      @RestController
-      public class SeatService {
-          @GetMapping("/seats")
-          public MovieTheatre getMovieTheatre(){
-              return new MovieTheatre(9,9);
-          }
-      }
+    learner_created: true
+  - name: src/cinema/errors/TicketException.java
+    visible: true
     learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13377#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sun, 05 Nov 2023 01:44:40 UTC"
 record: 3
