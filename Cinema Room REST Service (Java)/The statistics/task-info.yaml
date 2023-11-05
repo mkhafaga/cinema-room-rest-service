@@ -529,6 +529,256 @@ files:
           };
       }
     learner_created: false
+  - name: src/cinema/models/MovieTheatre.java
+    visible: true
+    text: |
+      package cinema.models;
+      
+      import java.util.ArrayList;
+      import java.util.List;
+      import org.springframework.stereotype.Component;
+      
+      public class MovieTheatre {
+          private int rows;
+          private int columns;
+          List<Seat> seats;
+      
+      
+          public MovieTheatre() {
+      
+          }
+      
+          public MovieTheatre(int rows, int columns) {
+              this.rows = rows;
+              this.columns = columns;
+              seats = new ArrayList();
+              for (int i = 0; i < rows; i++) {
+                  for (int j = 0; j < columns; j++) {
+                      seats.add(new Seat(i + 1, j + 1, i <= 4 ? 10 : 8));
+                  }
+              }
+          }
+      
+          public int getRows() {
+              return rows;
+          }
+      
+          public void setRows(int rows) {
+              this.rows = rows;
+          }
+      
+          public int getColumns() {
+              return columns;
+          }
+      
+          public void setColumns(int columns) {
+              this.columns = columns;
+          }
+      
+          public List<Seat> getSeats() {
+              return seats;
+          }
+      
+          public void setSeats(List<Seat> seats) {
+              this.seats = seats;
+          }
+      }
+    learner_created: true
+  - name: src/cinema/api/PurchaseService.java
+    visible: true
+    text: |
+      package cinema.api;
+      
+      import cinema.errors.TicketException;
+      import cinema.models.MovieTheatre;
+      import cinema.models.Seat;
+      import java.util.LinkedHashMap;
+      import java.util.List;
+      import java.util.Map;
+      import java.util.UUID;
+      import java.util.concurrent.ConcurrentHashMap;
+      import org.springframework.http.ResponseEntity;
+      import org.springframework.web.bind.annotation.ExceptionHandler;
+      import org.springframework.web.bind.annotation.PostMapping;
+      import org.springframework.web.bind.annotation.RequestBody;
+      import org.springframework.web.bind.annotation.RestController;
+      import org.springframework.web.context.request.WebRequest;
+      
+      @RestController
+      public class PurchaseService {
+      
+          private final MovieTheatre movieTheatre;
+      
+          private final Map<String, Seat> takenSeats = new ConcurrentHashMap<>();
+      
+          public PurchaseService(MovieTheatre movieTheatre) {
+              this.movieTheatre = movieTheatre;
+          }
+      
+          @PostMapping("/purchase")
+          public ResponseEntity<Map<String, Object>> purchase(@RequestBody Seat seat) {
+              List<Seat> seats = movieTheatre.getSeats();
+              Map<String, Object> response = new LinkedHashMap<>();
+              int row = seat.getRow();
+              int column = seat.getColumn();
+              if (row < 1 || row > 9 || column < 1 || column > 9) {
+                  throw new TicketException("The number of a row or a column is out of bounds!");
+              }
+      
+              Seat seatToBook = seats.get(((row - 1) * 9) + column - 1);
+              if (!seatToBook.isBooked()) {
+                  seatToBook.setBooked(true);
+                  UUID uuid = UUID.randomUUID();
+                  takenSeats.put(uuid.toString(), seatToBook);
+                  response.put("token", uuid.toString());
+                  response.put("ticket", seatToBook);
+                  return ResponseEntity.ok(response);
+              } else {
+                  throw new TicketException("The ticket has been already purchased!");
+              }
+          }
+      
+          @PostMapping("/return")
+          public ResponseEntity<Map<String, Object>> returnTicket(@RequestBody Map<String, String> params) {
+              String uuid = params.get("token");
+              if (takenSeats.containsKey(uuid)) {
+                  Seat returnedSeat = takenSeats.remove(uuid);
+                  returnedSeat.setBooked(false);
+                  Map<String, Object> response = new LinkedHashMap<>();
+                  response.put("ticket", returnedSeat);
+                  return ResponseEntity.ok(response);
+              } else {
+                  throw new TicketException("Wrong token!");
+              }
+          }
+      
+          @ExceptionHandler(TicketException.class)
+          public ResponseEntity<Map<String, String>> handleTicketException(TicketException e, WebRequest request) {
+              Map<String, String> message = new LinkedHashMap<>();
+              message.put("error", e.getMessage());
+              return ResponseEntity.badRequest().body(message);
+          }
+      }
+    learner_created: true
+  - name: src/cinema/errors/TicketException.java
+    visible: true
+    text: |
+      package cinema.errors;
+      
+      public class TicketException extends RuntimeException {
+          public TicketException(String message) {
+              super(message);
+          }
+      }
+    learner_created: true
+  - name: src/cinema/errors/ErrorMessage.java
+    visible: true
+    text: |
+      package cinema.errors;
+      
+      public class ErrorMessage {
+          private String error;
+      
+          public ErrorMessage(String error) {
+              this.error = error;
+          }
+      
+          public String getError() {
+              return error;
+          }
+      
+          public void setError(String error) {
+              this.error = error;
+          }
+      }
+    learner_created: true
+  - name: src/cinema/models/Seat.java
+    visible: true
+    text: |
+      package cinema.models;
+      
+      import com.fasterxml.jackson.annotation.JsonIgnore;
+      import org.springframework.stereotype.Component;
+      
+      public class Seat {
+          private int row;
+          private int column;
+      
+          private int price;
+      
+          @JsonIgnore
+          private boolean booked;
+      
+      
+          public Seat(){
+      
+          }
+          public Seat(int row, int column, int price) {
+              this.row = row;
+              this.column = column;
+              this.price = price;
+          }
+      
+          public int getRow() {
+              return row;
+          }
+      
+          public void setRow(int row) {
+              this.row = row;
+          }
+      
+          public int getColumn() {
+              return column;
+          }
+      
+          public void setColumn(int column) {
+              this.column = column;
+          }
+      
+          public int getPrice() {
+              return price;
+          }
+      
+          public void setPrice(int price) {
+              this.price = price;
+          }
+      
+          public boolean isBooked() {
+              return booked;
+          }
+      
+          public void setBooked(boolean booked) {
+              this.booked = booked;
+          }
+      }
+    learner_created: true
+  - name: src/cinema/api/SeatService.java
+    visible: true
+    text: |
+      package cinema.api;
+      
+      import cinema.models.MovieTheatre;
+      import org.springframework.web.bind.annotation.GetMapping;
+      import org.springframework.web.bind.annotation.RestController;
+      
+      @RestController
+      public class SeatService {
+          @GetMapping("/seats")
+          public MovieTheatre getMovieTheatre(){
+              return new MovieTheatre(9,9);
+          }
+      }
+    learner_created: true
+  - name: src/cinema/models/Statistics.java
+    visible: true
+    learner_created: true
+  - name: src/cinema/errors/UnauthorizedException.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13378#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Sun, 05 Nov 2023 07:06:23 UTC"
 record: -1
